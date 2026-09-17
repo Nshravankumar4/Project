@@ -51,7 +51,7 @@ Window {
         RowLayout {
             spacing: 20
 
-            // Zone 1 Buttons (Visible Interactive Controls)
+            // Zone 1 Widgets (Interactive Controls)
             ColumnLayout {
                 spacing: 15
                 Layout.alignment: Qt.AlignVCenter
@@ -71,7 +71,33 @@ Window {
                     font.bold: true
                     palette.buttonText: "white"
                     palette.button: "#e74c3c" // Red button
-                    onClicked: clusterViewModel.odometer = 0 // Note: This requires a WRITE property in C++ if fully implemented, but works for UI demo
+                    onClicked: clusterViewModel.odometer = 0 
+                }
+
+                // --- NEW QML WIDGETS ---
+                
+                // QML Switch (Toggle)
+                RowLayout {
+                    Text { text: "Lane Assist"; color: "white"; font.pixelSize: 14 }
+                    Switch {
+                        checked: true
+                        onCheckedChanged: console.log("Lane Assist: " + checked)
+                    }
+                }
+
+                // QML Slider (Cruise Control Speed)
+                Text { text: "Cruise: " + Math.round(cruiseSlider.value) + " km/h"; color: "white"; font.pixelSize: 14 }
+                Slider {
+                    id: cruiseSlider
+                    from: 0; to: 160; value: 60
+                    width: 120
+                }
+
+                // QML ProgressBar (Simulated Battery Health)
+                Text { text: "Battery Health"; color: "white"; font.pixelSize: 12 }
+                ProgressBar {
+                    value: 0.85 // 85% health
+                    width: 120
                 }
             }
 

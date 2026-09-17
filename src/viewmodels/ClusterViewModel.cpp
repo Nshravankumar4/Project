@@ -1,4 +1,5 @@
 #include "ClusterViewModel.h"
+#include "../utils/Logger.h"
 
 ClusterViewModel::ClusterViewModel(QObject *parent) 
     : QObject(parent), m_canSimulator(new CanSimulator(nullptr)) 
@@ -37,6 +38,7 @@ QString ClusterViewModel::alertMessage() const { return m_alertMessage; }
 void ClusterViewModel::setMenuIndex(int index) {
     if (m_menuIndex != index) {
         m_menuIndex = index;
+        Logger::getInstance().log("Menu Index changed to: " + QString::number(index));
         emit menuIndexChanged(m_menuIndex);
     }
 }
