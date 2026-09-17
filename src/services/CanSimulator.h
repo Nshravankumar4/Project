@@ -27,6 +27,8 @@ signals:
     void odometerReceived(int odo);
     void rangeReceived(int range);
     void adasDistanceReceived(int distance);
+    void menuIndexReceived(int index);
+    void alertMessageReceived(QString message);
 
 private slots:
     void initIpcConnection(); // Runs on the background thread

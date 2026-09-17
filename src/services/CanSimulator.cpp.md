@@ -1,6 +1,6 @@
 # src/services/CanSimulator.cpp - Explanation Guide
 
-**Purpose:** This implements the IPC Client logic. It proves your knowledge of Multithreading (moving sockets to a background thread) and IPC (Deserializing socket data).
+**Purpose:** This implements the IPC Client logic. It proves your knowledge of Multithreading (moving sockets to a background thread) and IPC (Deserializing massive socket data).
 
 ### Complete Code & Line-by-Line Explanation
 
@@ -9,51 +9,41 @@
 #include <QDataStream>
 #include <QDebug>
 
-// The exact same IPC socket name used by the VehicleService server.
 const QString SERVER_NAME = "AutomotiveIpcSocket";
 
 CanSimulator::CanSimulator(QObject *parent) 
     : QObject(parent), m_thread(std::make_unique<QThread>()), m_socket(nullptr), m_reconnectTimer(nullptr)
 {
-    // ------------------------------------------------------------------
-    // MULTITHREADING: We move this object to a background thread.
-    // This ensures that slow IPC/Network operations do NOT block the QML UI.
-    // ------------------------------------------------------------------
+    // MULTITHREADING: Move to background thread so IPC parsing doesn't freeze the GUI
     this->moveToThread(m_thread.get());
-
-    // When the thread actually starts, it will trigger initIpcConnection()
     connect(m_thread.get(), &QThread::started, this, &CanSimulator::initIpcConnection);
 }
 
 CanSimulator::~CanSimulator() {
-    stopSimulation(); // Safely stop the background thread before destroying
+    stopSimulation();
 }
 
 void CanSimulator::startSimulation() {
     if (!m_thread->isRunning()) {
-        m_thread->start(); // This kicks off the background thread
+        m_thread->start();
     }
 }
 
 void CanSimulator::stopSimulation() {
     if (m_thread->isRunning()) {
-        m_thread->quit(); // Tell thread to exit event loop
-        m_thread->wait(); // Block main thread until background thread actually finishes
+        m_thread->quit();
+        m_thread->wait(); 
     }
 }
 
 void CanSimulator::initIpcConnection() {
-    // 1. Objects created inside this method live on the background thread!
-    // We pass 'this' as the parent so Qt manages their memory.
     m_socket = new QLocalSocket(this);
     m_reconnectTimer = new QTimer(this);
 
-    // 2. Connect socket events to our slot functions
     connect(m_socket, &QLocalSocket::readyRead, this, &CanSimulator::onReadyRead);
     connect(m_socket, &QLocalSocket::disconnected, this, &CanSimulator::onDisconnected);
     
-    // 3. Auto-Reconnect logic: A C++ lambda function that checks if the socket is dead, 
-    // and if so, tries to reconnect to the SERVER_NAME every 1000ms.
+    // Auto-Reconnect lambda
     connect(m_reconnectTimer, &QTimer::timeout, this, [this]() {
         if (m_socket->state() == QLocalSocket::UnconnectedState) {
             m_socket->connectToServer(SERVER_NAME);
@@ -61,7 +51,7 @@ void CanSimulator::initIpcConnection() {
     });
 
     m_reconnectTimer->start(1000); 
-    m_socket->connectToServer(SERVER_NAME); // Initial connection attempt
+    m_socket->connectToServer(SERVER_NAME);
 }
 
 void CanSimulator::onDisconnected() {
@@ -69,25 +59,28 @@ void CanSimulator::onDisconnected() {
 }
 
 void CanSimulator::onReadyRead() {
-    // 4. Data has arrived over the IPC Socket! We wrap the socket in a QDataStream.
     QDataStream in(m_socket);
     in.setVersion(QDataStream::Qt_6_0);
 
     // Read all available data from the IPC socket buffer
     while (!in.atEnd()) {
-        int speed = 0, rpm = 0, batterySoc = 0;
+        int speed = 0, rpm = 0, batterySoc = 0, turnSignal = 0, odometer = 0, range = 0, adasDistance = 0, menuIndex = 0;
+        QString gear, alertMessage;
         
-        // 5. Deserialization: Extract the binary data into our integers
-        in >> speed >> rpm >> batterySoc;
+        // Deserialization: Extract the binary data perfectly in order
+        in >> speed >> rpm >> batterySoc >> gear >> turnSignal >> odometer >> range >> adasDistance >> menuIndex >> alertMessage;
 
-        // 6. CROSS-THREAD COMMUNICATION:
-        // Because this class lives on the background thread, calling 'emit' sends a 
-        // message across thread boundaries. The ViewModel (living on the main thread) 
-        // will receive this data safely via Qt's Event Loop queuing.
+        // CROSS-THREAD COMMUNICATION: Send data to the main thread securely
         emit speedReceived(speed);
         emit rpmReceived(rpm);
         emit batterySocReceived(batterySoc);
+        emit gearReceived(gear);
+        emit turnSignalReceived(turnSignal);
+        emit odometerReceived(odometer);
+        emit rangeReceived(range);
+        emit adasDistanceReceived(adasDistance);
+        emit menuIndexReceived(menuIndex);
+        emit alertMessageReceived(alertMessage);
     }
 }
 ```
-

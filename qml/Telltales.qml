@@ -7,28 +7,49 @@ Item {
     height: 40
 
     property int turnSignal: 0 // 0=off, 1=left, 2=right
+    property bool flashState: false
+
+    Timer {
+        interval: 400 // Slightly faster flash
+        running: root.turnSignal !== 0
+        repeat: true
+        onTriggered: root.flashState = !root.flashState
+        onRunningChanged: if (running) root.flashState = true; else root.flashState = false
+    }
 
     RowLayout {
         anchors.centerIn: parent
-        spacing: 40
+        spacing: 50
 
-        // Left Blinker
+        // Left Blinker (Flashing + Clickable)
         Text {
             text: "◄"
-            color: root.turnSignal === 1 ? "#2ecc71" : "#222222"
-            font.pixelSize: 36
+            color: (root.turnSignal === 1 && root.flashState) ? "#00ff00" : "#333333"
+            font.pixelSize: 42
+            layer.enabled: true
+            
+            MouseArea {
+                anchors.fill: parent
+                onClicked: root.turnSignal = (root.turnSignal === 1) ? 0 : 1
+            }
         }
 
-        // Dummy warning lights
-        Text { text: "ABS"; color: "#f39c12"; font.pixelSize: 20; font.bold: true; opacity: 0.2 }
-        Text { text: "BRAKE"; color: "#e74c3c"; font.pixelSize: 20; font.bold: true; opacity: 0.2 }
-        Text { text: "ESP"; color: "#f1c40f"; font.pixelSize: 20; font.bold: true; opacity: 0.2 }
+        // Warning lights (Static)
+        Text { text: "ABS"; color: "#f39c12"; font.pixelSize: 22; font.bold: true; opacity: 0.3 }
+        Text { text: "BRAKE"; color: "#e74c3c"; font.pixelSize: 22; font.bold: true; opacity: 0.3 }
+        Text { text: "ESP"; color: "#f1c40f"; font.pixelSize: 22; font.bold: true; opacity: 0.3 }
 
-        // Right Blinker
+        // Right Blinker (Flashing + Clickable)
         Text {
             text: "►"
-            color: root.turnSignal === 2 ? "#2ecc71" : "#222222"
-            font.pixelSize: 36
+            color: (root.turnSignal === 2 && root.flashState) ? "#00ff00" : "#333333"
+            font.pixelSize: 42
+            layer.enabled: true
+            
+            MouseArea {
+                anchors.fill: parent
+                onClicked: root.turnSignal = (root.turnSignal === 2) ? 0 : 2
+            }
         }
     }
 }

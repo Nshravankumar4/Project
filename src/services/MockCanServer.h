@@ -36,5 +36,9 @@ private:
     int m_odometer = 15420;
     int m_range = 450;
     int m_adasDistance = 100;
+    
+    // New features for Info Pages and Alerts
+    int m_menuIndex = 0;
+    QString m_alertMessage = "";
 };
 

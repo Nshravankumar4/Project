@@ -12,6 +12,8 @@ ClusterViewModel::ClusterViewModel(QObject *parent)
     connect(m_canSimulator, &CanSimulator::odometerReceived, this, &ClusterViewModel::onOdometerReceived);
     connect(m_canSimulator, &CanSimulator::rangeReceived, this, &ClusterViewModel::onRangeReceived);
     connect(m_canSimulator, &CanSimulator::adasDistanceReceived, this, &ClusterViewModel::onAdasDistanceReceived);
+    connect(m_canSimulator, &CanSimulator::menuIndexReceived, this, &ClusterViewModel::onMenuIndexReceived);
+    connect(m_canSimulator, &CanSimulator::alertMessageReceived, this, &ClusterViewModel::onAlertMessageReceived);
 
     m_canSimulator->startSimulation();
 }
@@ -29,6 +31,22 @@ int ClusterViewModel::turnSignal() const { return m_turnSignal; }
 int ClusterViewModel::odometer() const { return m_odometer; }
 int ClusterViewModel::range() const { return m_range; }
 int ClusterViewModel::adasDistance() const { return m_adasDistance; }
+int ClusterViewModel::menuIndex() const { return m_menuIndex; }
+QString ClusterViewModel::alertMessage() const { return m_alertMessage; }
+
+void ClusterViewModel::setMenuIndex(int index) {
+    if (m_menuIndex != index) {
+        m_menuIndex = index;
+        emit menuIndexChanged(m_menuIndex);
+    }
+}
+
+void ClusterViewModel::setOdometer(int odo) {
+    if (m_odometer != odo) {
+        m_odometer = odo;
+        emit odometerChanged(m_odometer);
+    }
+}
 
 void ClusterViewModel::onSpeedReceived(int speed) {
     if (m_speed != speed) {
@@ -83,5 +101,19 @@ void ClusterViewModel::onAdasDistanceReceived(int distance) {
     if (m_adasDistance != distance) {
         m_adasDistance = distance;
         emit adasDistanceChanged(m_adasDistance);
+    }
+}
+
+void ClusterViewModel::onMenuIndexReceived(int index) {
+    if (m_menuIndex != index) {
+        m_menuIndex = index;
+        emit menuIndexChanged(m_menuIndex);
+    }
+}
+
+void ClusterViewModel::onAlertMessageReceived(QString message) {
+    if (m_alertMessage != message) {
+        m_alertMessage = message;
+        emit alertMessageChanged(m_alertMessage);
     }
 }

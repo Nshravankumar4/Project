@@ -72,11 +72,13 @@ void MockCanServer::broadcastVehicleData() {
     if (m_speed > 0) m_gear = "D";
     else m_gear = "P";
 
-    // Simulate Turn signals blinking (cycles every ~1 second)
+    // Simulate Turn signals being active (Turn on left signal when speed is between 40 and 60)
     static int tickCount = 0;
     tickCount++;
-    if (tickCount % 20 < 10 && m_speed > 40 && m_speed < 60) {
-        m_turnSignal = 1; // Left blinker on randomly
+    if (m_speed > 40 && m_speed < 60) {
+        m_turnSignal = 1; // Left turn signal ON
+    } else if (m_speed > 120 && m_speed < 140) {
+        m_turnSignal = 2; // Right turn signal ON
     } else {
         m_turnSignal = 0;
     }
@@ -87,13 +89,27 @@ void MockCanServer::broadcastVehicleData() {
     if (m_adasDistance < 10) m_adasDistance = 10;
     if (m_adasDistance > 150) m_adasDistance = 150;
 
+    // Simulate Steering Wheel Menu buttons being pressed
+    if (tickCount % 50 == 0) { // Every 5 seconds, switch the menu
+        m_menuIndex = (m_menuIndex + 1) % 4; // 4 info pages total
+    }
+
+    // Simulate Alerts (e.g., Door Open, Low Fuel)
+    if (m_speed > 100 && tickCount % 40 == 0) {
+        m_alertMessage = "SPEED WARNING!";
+    } else if (m_range < 50) {
+        m_alertMessage = "LOW FUEL!";
+    } else {
+        m_alertMessage = ""; // No alert
+    }
+
     // 2. Serialize data and broadcast via IPC Socket
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_6_0);
     
-    // Binary packet: [Speed][RPM][Battery][Gear][TurnSignal][Odometer][Range][ADAS]
-    out << m_speed << m_rpm << 85 << m_gear << m_turnSignal << m_odometer << m_range << m_adasDistance; 
+    // Binary packet: [Speed][RPM][Battery][Gear][TurnSignal][Odo][Range][ADAS][Menu][Alert]
+    out << m_speed << m_rpm << 85 << m_gear << m_turnSignal << m_odometer << m_range << m_adasDistance << m_menuIndex << m_alertMessage; 
 
     for (QLocalSocket* client : m_clients) {
         if (client->state() == QLocalSocket::ConnectedState) {

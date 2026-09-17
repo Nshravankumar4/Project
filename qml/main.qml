@@ -4,15 +4,40 @@ import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
 
 Window {
+    id: root
     width: 1280
     height: 480
     visible: true
     title: qsTr("Hyundai Mobis Digital Cluster")
     color: "#050505" 
 
-    // Telltales at the top
+
+
+    // 0. Simulated Map Background (Optional "Navigation" layer)
+    Rectangle {
+        anchors.fill: parent
+        color: "#0a192f"
+        opacity: clusterViewModel.menuIndex === 3 ? 0.4 : 0.0 // Only show when Nav is selected
+        Behavior on opacity { NumberAnimation { duration: 500 } }
+        
+        // Fake Map Grid
+        Grid {
+            anchors.fill: parent
+            rows: 10; columns: 20
+            Repeater {
+                model: 200
+                Rectangle { width: 64; height: 48; color: "transparent"; border.color: "#1e3a8a"; border.width: 1 }
+            }
+        }
+    }
+
+    // State for Zone 1 toggle
+    property bool isMph: false
+
+    // 1. Telltales Component
     Telltales {
         anchors.top: parent.top
+        anchors.topMargin: 20
         anchors.horizontalCenter: parent.horizontalCenter
         turnSignal: clusterViewModel.turnSignal
     }
@@ -22,18 +47,67 @@ Window {
         anchors.centerIn: parent
         spacing: 30
 
-        // ZONE 1: Speedometer (Left)
-        DialGauge {
-            value: clusterViewModel.speed
-            maxValue: 240
-            title: "SPEED"
-            label: "km/h"
-            glowColor: "#00d2ff" // Cyan glow
+        // ZONE 1: Speedometer & Controls Layout (Left Side)
+        RowLayout {
+            spacing: 20
+
+            // Zone 1 Buttons (Visible Interactive Controls)
+            ColumnLayout {
+                spacing: 15
+                Layout.alignment: Qt.AlignVCenter
+                
+                Button {
+                    text: root.isMph ? "USE KM/H" : "USE MPH"
+                    font.pixelSize: 14
+                    font.bold: true
+                    palette.buttonText: "white"
+                    palette.button: "#1e3a8a" // Blue button
+                    onClicked: root.isMph = !root.isMph
+                }
+
+                Button {
+                    text: "RESET ODO"
+                    font.pixelSize: 14
+                    font.bold: true
+                    palette.buttonText: "white"
+                    palette.button: "#e74c3c" // Red button
+                    onClicked: clusterViewModel.odometer = 0 // Note: This requires a WRITE property in C++ if fully implemented, but works for UI demo
+                }
+            }
+
+            // Speedometer Gauge
+            DialGauge {
+                width: 350; height: 350
+                value: root.isMph ? (clusterViewModel.speed * 0.621371) : clusterViewModel.speed
+                maxValue: root.isMph ? 160 : 240
+                title: "SPEED"
+                label: root.isMph ? "mph" : "km/h"
+                glowColor: "#00d2ff"
+            }
         }
 
-        // ZONE 2: ADAS Center View
-        AdasCenter {
-            adasDistance: clusterViewModel.adasDistance
+        // ZONE 2: Center View (ADAS + Info Menu)
+        Item {
+            width: 400
+            height: 480
+            
+            // ADAS Center View
+            AdasCenter {
+                anchors.fill: parent
+                adasDistance: clusterViewModel.adasDistance
+            }
+
+            // Info Menu (Overlays ADAS view)
+            InfoMenu {
+                anchors.centerIn: parent
+                currentIndex: clusterViewModel.menuIndex
+            }
+            
+            // Interactive touch for Center Zone
+            MouseArea {
+                anchors.fill: parent
+                onClicked: clusterViewModel.menuIndex = (clusterViewModel.menuIndex + 1) % 4
+            }
         }
 
         // ZONE 3: RPM Tachometer (Right)
@@ -83,5 +157,12 @@ Window {
             color: "#aaaaaa"
             font.pixelSize: 18
         }
+    }
+
+    // Floating Alert Popup (Highest Z-index, overlays everything)
+    AlertPopup {
+        anchors.centerIn: parent
+        anchors.verticalCenterOffset: -100 // Slightly above center
+        message: clusterViewModel.alertMessage
     }
 }

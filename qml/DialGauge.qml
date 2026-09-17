@@ -62,25 +62,22 @@ Item {
                 color: "#666666"
                 font.pixelSize: 14
                 font.letterSpacing: 2
-                horizontalAlignment: Text.AlignHCenter
-                width: parent.width
+                anchors.horizontalCenter: parent.horizontalCenter
             }
             
             Text {
-                text: Math.round(root.value).toString()
+                text: Number(root.value).toFixed(0)
                 color: "white"
                 font.pixelSize: 82
                 font.bold: true
-                horizontalAlignment: Text.AlignHCenter
-                width: parent.width
+                anchors.horizontalCenter: parent.horizontalCenter
             }
 
             Text {
                 text: root.label
                 color: "#888888"
                 font.pixelSize: 18
-                horizontalAlignment: Text.AlignHCenter
-                width: parent.width
+                anchors.horizontalCenter: parent.horizontalCenter
             }
         }
     }
