@@ -26,6 +26,8 @@ set(CLUSTER_SOURCES
     qml/DialGauge.qml.md
     qml/AdasCenter.qml.md
     qml/Telltales.qml.md
+    qml/InfoMenu.qml.md
+    qml/AlertPopup.qml.md
     CMakeLists.txt.md
 )
 
@@ -52,6 +54,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         qml/DialGauge.qml
         qml/AdasCenter.qml
         qml/Telltales.qml
+        qml/InfoMenu.qml
+        qml/AlertPopup.qml
     )
     
     if(COMMAND qt_policy)

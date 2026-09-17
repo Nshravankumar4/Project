@@ -15,9 +15,11 @@ class ClusterViewModel : public QObject {
     Q_PROPERTY(int batterySoc READ batterySoc NOTIFY batterySocChanged)
     Q_PROPERTY(QString gear READ gear NOTIFY gearChanged)
     Q_PROPERTY(int turnSignal READ turnSignal NOTIFY turnSignalChanged)
-    Q_PROPERTY(int odometer READ odometer NOTIFY odometerChanged)
+    Q_PROPERTY(int odometer READ odometer WRITE setOdometer NOTIFY odometerChanged)
     Q_PROPERTY(int range READ range NOTIFY rangeChanged)
     Q_PROPERTY(int adasDistance READ adasDistance NOTIFY adasDistanceChanged)
+    Q_PROPERTY(int menuIndex READ menuIndex WRITE setMenuIndex NOTIFY menuIndexChanged)
+    Q_PROPERTY(QString alertMessage READ alertMessage NOTIFY alertMessageChanged)
 
 public:
     explicit ClusterViewModel(QObject *parent = nullptr);
@@ -31,6 +33,11 @@ public:
     int odometer() const;
     int range() const;
     int adasDistance() const;
+    int menuIndex() const;
+    QString alertMessage() const;
+
+    void setMenuIndex(int index);
+    void setOdometer(int odo);
 
 signals:
     void speedChanged(int speed);
@@ -41,6 +48,8 @@ signals:
     void odometerChanged(int odo);
     void rangeChanged(int range);
     void adasDistanceChanged(int distance);
+    void menuIndexChanged(int index);
+    void alertMessageChanged(QString message);
 
 private slots:
     void onSpeedReceived(int speed);
@@ -51,6 +60,8 @@ private slots:
     void onOdometerReceived(int odo);
     void onRangeReceived(int range);
     void onAdasDistanceReceived(int distance);
+    void onMenuIndexReceived(int index);
+    void onAlertMessageReceived(QString message);
 
 private:
     int m_speed = 0;
@@ -61,6 +72,8 @@ private:
     int m_odometer = 0;
     int m_range = 0;
     int m_adasDistance = 100;
+    int m_menuIndex = 0;
+    QString m_alertMessage = "";
     
     CanSimulator* m_canSimulator;
 };

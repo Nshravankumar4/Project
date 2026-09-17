@@ -62,7 +62,7 @@ Item {
         Rectangle { width: 15; height: 5; color: "red"; radius: 2; anchors.bottom: parent.bottom; anchors.right: parent.right; anchors.margins: 5 }
     }
 
-    // Our Car (Mockup at bottom)
+    // Our Car (Static mockup at the bottom of the screen)
     Rectangle {
         width: 120
         height: 60
@@ -70,8 +70,7 @@ Item {
         color: "#ffffff"
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: -20
+        anchors.bottomMargin: 30 // Moved up so it doesn't overlap PRND
         opacity: 0.8
     }
 }
-

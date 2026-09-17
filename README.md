@@ -1,37 +1,35 @@
-# Automotive Cluster -
+# Automotive Cluster - Hyundai Mobis Style Digital Cockpit
 
-This project is a complete, multi-process end-to-end example designed specifically for the **C++ + Qt/QML + Automotive Cluster** interview preparation root map.
+This project is a complete, production-grade **Multi-Process Automotive Digital Cluster** built with modern C++ and Qt/QML. It is designed specifically to demonstrate the skills required for an Automotive HMI/Middleware role (C++17, Qt/QML, IPC, Multithreading, MVVM).
 
-## Architecture
+## 🚀 Architecture: Dual-Process IPC
 
-To match a real **QNX / Automotive** environment, this project is split into **Two Processes** that communicate via **IPC (Inter-Process Communication)**:
+To simulate a real **QNX / Automotive Linux** environment, this project is split into two independent executables communicating via **Local Sockets (IPC)**:
 
-1. **`VehicleService` (The Server)**
-   * Simulates a background QNX daemon reading CAN bus data.
-   * Runs a `QLocalServer` (Socket IPC) to broadcast data.
-   * Proves your knowledge of: **Processes**, **Sockets**, **C++17**.
+### 1. `VehicleService` (The Middleware Server)
+*   A headless background daemon simulating physical car hardware.
+*   Runs a `QLocalServer` to broadcast a complex binary data stream every 100ms.
+*   **Simulates:** Speed, RPM, Gear (PRND), Battery SOC, Odometer, Range, Turn Signals, ADAS Distance, Steering Wheel Menu Toggles, and Critical System Alerts.
 
-2. **`AutomotiveCluster` (The GUI Client)**
-   * The actual Dashboard UI.
-   * Connects to the IPC socket using `QLocalSocket` on a **background thread**.
-   * Uses **MVVM** to bridge the IPC data to the QML UI.
+### 2. `AutomotiveCluster` (The GUI Client)
+*   The graphical Dashboard UI featuring a modern **3-Zone Layout** (Hyundai/Kia style).
+*   **Multithreading:** The IPC Client (`CanSimulator.cpp`) runs on a dedicated `QThread`, deserializing the binary network stream without blocking the UI.
+*   **MVVM Pattern:** `ClusterViewModel` acts as the bridge, exposing the background thread data to the QML frontend safely via `Q_PROPERTY`.
 
-### How it aligns with your JD:
+## 🎨 UI Features (QML)
+*   **Procedural Graphics:** Glowing Speed and RPM gauges drawn purely using math and `QtQuick.Shapes`—no static image assets required!
+*   **ADAS Center View:** A dynamic 3D-perspective road that animates a lead car based on the distance data from the IPC server.
+*   **Interactive Info Menu:** A center screen overlay that cycles through Trip Info, Tire Pressure, and Navigation.
+*   **Dynamic Alerts:** An overriding, flashing red popup system that triggers instantly when the IPC server broadcasts a warning (e.g., "SPEED WARNING!").
+*   **Touch Events:** Click the dashboard to simulate steering wheel buttons and cycle the menus manually!
 
-- **IPC Mechanism (Socket / D-Bus)**: `VehicleService` and `AutomotiveCluster` communicate using `QLocalSocket`. 
-- **Process & Multi Threads**: The GUI runs in one process. The Service runs in another. Inside the GUI, the IPC client (`CanSimulator.cpp`) runs on a dedicated `QThread` so network delays don't freeze the QML UI.
-- **Design Patterns (MVVM)**: `ClusterViewModel.cpp` connects the raw IPC data to the QML View using `Q_PROPERTY`.
-- **C++17/20**: Usage of smart pointers (`std::unique_ptr`), lambdas for thread connections, and `<random>`.
-- **Qt/QML GUI**: `main.qml` and `Speedometer.qml` use QtQuick, Layouts, and Animations.
+## 🛠️ How to Build and Run
 
-## How to Build and Run
+**CRITICAL:** You must run BOTH applications for the cluster to work.
 
-### Option 1: Qt Creator (Recommended)
-1. Open Qt Creator.
-2. Select `File` -> `Open File or Project...`
-3. Select the `CMakeLists.txt` file in this directory.
-4. Build the project (Ctrl+B).
-5. **CRITICAL STEP:** You must run BOTH applications.
-   * Run `VehicleService.exe` first. A console will open saying "IPC Server is running".
-   * Then run `AutomotiveCluster.exe`. It will connect to the socket and the speedometer will start moving!
+1. Open `CMakeLists.txt` in Qt Creator.
+2. Build the project (Ctrl+B).
+3. **Start the Server:** In Qt Creator's Run Settings, select `VehicleService`. Run it. A console will open saying *"VehicleService (IPC Server) is running"*.
+4. **Start the GUI:** Leave the console open. Change Run Settings to `AutomotiveCluster` and run it. The GUI will instantly connect to the server and the car will come alive!
 
+*(Note: Every source file in this project has a matching `.md` file right next to it explaining the code line-by-line for interview study purposes!)*
