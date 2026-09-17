@@ -25,6 +25,11 @@ set(CLUSTER_SOURCES
 qt_add_executable(AutomotiveCluster MANUAL_FINALIZATION ${CLUSTER_SOURCES})
 
 # Embed all QML files into the executable
+if(COMMAND qt_policy)
+    qt_policy(SET QTP0001 NEW)
+    qt_policy(SET QTP0004 OLD)
+endif()
+
 qt_add_qml_module(AutomotiveCluster
     URI ClusterApp
     VERSION 1.0
