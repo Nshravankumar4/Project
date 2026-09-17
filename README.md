@@ -74,3 +74,5 @@ By building this as **two separate executables** that talk via `QLocalSocket`, t
 2. Build the project (Ctrl+B).
 3. **Start the Server:** In Qt Creator's Run Settings, select `VehicleService`. Run it. A console will open saying *"VehicleService (IPC Server) is running"*.
 4. **Start the GUI:** Leave the console open. Change Run Settings to `AutomotiveCluster` and run it. The GUI will instantly connect to the server! Click the left buttons and the blinkers to test the interactivity!
+5. <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/1b0c14c4-8119-4650-93ef-ee2f88c407e5" />
+
