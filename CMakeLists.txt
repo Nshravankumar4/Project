@@ -13,30 +13,27 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Quick Gui Network)
 
 set(CLUSTER_SOURCES
     src/main.cpp
-    src/viewmodels/ClusterViewModel.cpp
-    src/viewmodels/ClusterViewModel.h
-    src/services/CanSimulator.cpp
-    src/services/CanSimulator.h
-)
-
-set(md_files
-    CMakeLists.txt.md
     src/main.cpp.md
-    src/VehicleServiceMain.cpp.md
-    src/services/CanSimulator.cpp.md
-    src/services/CanSimulator.h.md
-    src/services/MockCanServer.cpp.md
-    src/services/MockCanServer.h.md
+    src/viewmodels/ClusterViewModel.cpp
     src/viewmodels/ClusterViewModel.cpp.md
+    src/viewmodels/ClusterViewModel.h
     src/viewmodels/ClusterViewModel.h.md
+    src/services/CanSimulator.cpp
+    src/services/CanSimulator.cpp.md
+    src/services/CanSimulator.h
+    src/services/CanSimulator.h.md
     qml/main.qml.md
     qml/Speedometer.qml.md
+    CMakeLists.txt.md
 )
 
 set(SERVICE_SOURCES
     src/VehicleServiceMain.cpp
+    src/VehicleServiceMain.cpp.md
     src/services/MockCanServer.cpp
+    src/services/MockCanServer.cpp.md
     src/services/MockCanServer.h
+    src/services/MockCanServer.h.md
 )
 
 # Qt6/Qt5 specific target setup
@@ -45,7 +42,6 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(AutomotiveCluster
         MANUAL_FINALIZATION
         ${CLUSTER_SOURCES}
-        ${md_files}
     )
     
     # QML files
@@ -73,7 +69,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 
 else()
     # Qt5 alternative
-    add_executable(AutomotiveCluster ${CLUSTER_SOURCES} ${md_files})
+    add_executable(AutomotiveCluster ${CLUSTER_SOURCES})
     target_link_libraries(AutomotiveCluster PRIVATE Qt5::Core Qt5::Quick Qt5::Gui Qt5::Network)
     
     add_executable(VehicleService ${SERVICE_SOURCES})
