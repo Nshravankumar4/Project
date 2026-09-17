@@ -7,93 +7,48 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-# Find Qt6 or Qt5
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Quick Gui Network)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Quick Gui Network)
+# Find Qt6
+find_package(Qt6 REQUIRED COMPONENTS Core Quick Gui Network)
 
+# -------------------------------------------------------------
+# TARGET 1: The Automotive Cluster (GUI Client)
+# -------------------------------------------------------------
 set(CLUSTER_SOURCES
     src/main.cpp
-    src/main.cpp.md
     src/viewmodels/ClusterViewModel.cpp
-    src/viewmodels/ClusterViewModel.cpp.md
     src/viewmodels/ClusterViewModel.h
-    src/viewmodels/ClusterViewModel.h.md
     src/services/CanSimulator.cpp
-    src/services/CanSimulator.cpp.md
     src/services/CanSimulator.h
-    src/services/CanSimulator.h.md
-    qml/main.qml.md
-    qml/DialGauge.qml.md
-    qml/AdasCenter.qml.md
-    qml/Telltales.qml.md
-    qml/InfoMenu.qml.md
-    qml/AlertPopup.qml.md
-    CMakeLists.txt.md
+    src/utils/Logger.h
 )
 
-set(SERVICE_SOURCES
-    src/VehicleServiceMain.cpp
-    src/VehicleServiceMain.cpp.md
-    src/services/MockCanServer.cpp
-    src/services/MockCanServer.cpp.md
-    src/services/MockCanServer.h
-    src/services/MockCanServer.h.md
-)
+qt_add_executable(AutomotiveCluster MANUAL_FINALIZATION ${CLUSTER_SOURCES})
 
-# Qt6/Qt5 specific target setup
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    # 1. Automotive Cluster (GUI Client)
-    qt_add_executable(AutomotiveCluster
-        MANUAL_FINALIZATION
-        ${CLUSTER_SOURCES}
-    )
-    
-    # QML files
-    set(QML_FILES
+# Embed all QML files into the executable
+qt_add_qml_module(AutomotiveCluster
+    URI ClusterApp
+    VERSION 1.0
+    QML_FILES
         qml/main.qml
         qml/DialGauge.qml
         qml/AdasCenter.qml
         qml/Telltales.qml
         qml/InfoMenu.qml
         qml/AlertPopup.qml
-    )
-    
-    if(COMMAND qt_policy)
-        qt_policy(SET QTP0001 NEW)
-        qt_policy(SET QTP0004 OLD)
-    endif()
-
-    qt_add_qml_module(AutomotiveCluster
-        URI ClusterApp
-        VERSION 1.0
-        QML_FILES ${QML_FILES}
-    )
-
-    qt_import_qml_plugins(AutomotiveCluster)
-    qt_finalize_executable(AutomotiveCluster)
-    
-    # 2. Vehicle Service (Background IPC Server)
-    qt_add_executable(VehicleService ${SERVICE_SOURCES})
-
-else()
-    # Qt5 alternative
-    add_executable(AutomotiveCluster ${CLUSTER_SOURCES})
-    target_link_libraries(AutomotiveCluster PRIVATE Qt5::Core Qt5::Quick Qt5::Gui Qt5::Network)
-    
-    add_executable(VehicleService ${SERVICE_SOURCES})
-    target_link_libraries(VehicleService PRIVATE Qt5::Core Qt5::Network)
-endif()
-
-# Link Libraries
-target_link_libraries(AutomotiveCluster PRIVATE
-    Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Quick
-    Qt${QT_VERSION_MAJOR}::Gui
-    Qt${QT_VERSION_MAJOR}::Network
 )
 
-target_link_libraries(VehicleService PRIVATE
-    Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Network
+target_link_libraries(AutomotiveCluster PRIVATE Qt6::Core Qt6::Quick Qt6::Gui Qt6::Network)
+qt_import_qml_plugins(AutomotiveCluster)
+qt_finalize_executable(AutomotiveCluster)
+
+# -------------------------------------------------------------
+# TARGET 2: The Vehicle Service (IPC Hardware Daemon Server)
+# -------------------------------------------------------------
+set(SERVICE_SOURCES
+    src/VehicleServiceMain.cpp
+    src/services/MockCanServer.cpp
+    src/services/MockCanServer.h
 )
 
+qt_add_executable(VehicleService ${SERVICE_SOURCES})
+target_link_libraries(VehicleService PRIVATE Qt6::Core Qt6::Network)
