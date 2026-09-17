@@ -1,4 +1,4 @@
-# Automotive Cluster - Complete Real-World Project
+# Automotive Cluster -
 
 This project is a complete, multi-process end-to-end example designed specifically for the **C++ + Qt/QML + Automotive Cluster** interview preparation root map.
 
