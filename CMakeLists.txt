@@ -52,3 +52,26 @@ set(SERVICE_SOURCES
 
 qt_add_executable(VehicleService ${SERVICE_SOURCES})
 target_link_libraries(VehicleService PRIVATE Qt6::Core Qt6::Network)
+
+# -------------------------------------------------------------
+# TARGET 3: Documentation (So .md files show up in Qt Creator)
+# -------------------------------------------------------------
+set(DOC_FILES
+    README.md
+    docs/AdasCenter.qml.md
+    docs/AlertPopup.qml.md
+    docs/CanSimulator.cpp.md
+    docs/CanSimulator.h.md
+    docs/ClusterViewModel.cpp.md
+    docs/ClusterViewModel.h.md
+    docs/DialGauge.qml.md
+    docs/InfoMenu.qml.md
+    docs/Logger.h.md
+    docs/main.cpp.md
+    docs/main.qml.md
+    docs/MockCanServer.cpp.md
+    docs/MockCanServer.h.md
+    docs/Telltales.qml.md
+    docs/VehicleServiceMain.cpp.md
+)
+add_custom_target(StudyGuides SOURCES ${DOC_FILES})
