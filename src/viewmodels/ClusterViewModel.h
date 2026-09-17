@@ -13,32 +13,54 @@ class ClusterViewModel : public QObject {
     Q_PROPERTY(int speed READ speed NOTIFY speedChanged)
     Q_PROPERTY(int rpm READ rpm NOTIFY rpmChanged)
     Q_PROPERTY(int batterySoc READ batterySoc NOTIFY batterySocChanged)
+    Q_PROPERTY(QString gear READ gear NOTIFY gearChanged)
+    Q_PROPERTY(int turnSignal READ turnSignal NOTIFY turnSignalChanged)
+    Q_PROPERTY(int odometer READ odometer NOTIFY odometerChanged)
+    Q_PROPERTY(int range READ range NOTIFY rangeChanged)
+    Q_PROPERTY(int adasDistance READ adasDistance NOTIFY adasDistanceChanged)
 
 public:
     explicit ClusterViewModel(QObject *parent = nullptr);
     ~ClusterViewModel() override;
 
-    // Getters for Q_PROPERTY
     int speed() const;
     int rpm() const;
     int batterySoc() const;
+    QString gear() const;
+    int turnSignal() const;
+    int odometer() const;
+    int range() const;
+    int adasDistance() const;
 
 signals:
-    // NOTIFY signals for Q_PROPERTY
     void speedChanged(int speed);
     void rpmChanged(int rpm);
     void batterySocChanged(int soc);
+    void gearChanged(QString gear);
+    void turnSignalChanged(int signal);
+    void odometerChanged(int odo);
+    void rangeChanged(int range);
+    void adasDistanceChanged(int distance);
 
 private slots:
-    // Slots to receive data from the CanSimulator thread
     void onSpeedReceived(int speed);
     void onRpmReceived(int rpm);
     void onBatterySocReceived(int soc);
+    void onGearReceived(QString gear);
+    void onTurnSignalReceived(int signal);
+    void onOdometerReceived(int odo);
+    void onRangeReceived(int range);
+    void onAdasDistanceReceived(int distance);
 
 private:
     int m_speed = 0;
     int m_rpm = 0;
     int m_batterySoc = 100;
+    QString m_gear = "P";
+    int m_turnSignal = 0;
+    int m_odometer = 0;
+    int m_range = 0;
+    int m_adasDistance = 100;
     
     CanSimulator* m_canSimulator;
 };

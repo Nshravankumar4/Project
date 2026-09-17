@@ -22,6 +22,11 @@ signals:
     void speedReceived(int speed);
     void rpmReceived(int rpm);
     void batterySocReceived(int soc);
+    void gearReceived(QString gear);
+    void turnSignalReceived(int signal);
+    void odometerReceived(int odo);
+    void rangeReceived(int range);
+    void adasDistanceReceived(int distance);
 
 private slots:
     void initIpcConnection(); // Runs on the background thread

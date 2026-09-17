@@ -55,19 +55,45 @@ void MockCanServer::broadcastVehicleData() {
     static std::mt19937 gen(std::random_device{}());
     std::uniform_int_distribution<> speedDist(-2, 3);
     
+    // Simulate speed
     m_speed += speedDist(gen);
     if (m_speed < 0) m_speed = 0;
     if (m_speed > 220) m_speed = 220;
     
-    m_rpm = 1000 + (m_speed * 30); // Rough correlation
+    // Simulate RPM
+    if (m_speed == 0) {
+        m_rpm = 800; // Idle
+    } else {
+        m_rpm = 1000 + (m_speed * 25) + (speedDist(gen) * 50); 
+        if (m_rpm > 7000) m_rpm = 7000;
+    }
+
+    // Simulate Gear logic
+    if (m_speed > 0) m_gear = "D";
+    else m_gear = "P";
+
+    // Simulate Turn signals blinking (cycles every ~1 second)
+    static int tickCount = 0;
+    tickCount++;
+    if (tickCount % 20 < 10 && m_speed > 40 && m_speed < 60) {
+        m_turnSignal = 1; // Left blinker on randomly
+    } else {
+        m_turnSignal = 0;
+    }
+
+    // Simulate ADAS (Distance to car ahead, bounces around)
+    std::uniform_int_distribution<> adasDist(-5, 5);
+    m_adasDistance += adasDist(gen);
+    if (m_adasDistance < 10) m_adasDistance = 10;
+    if (m_adasDistance > 150) m_adasDistance = 150;
 
     // 2. Serialize data and broadcast via IPC Socket
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_6_0);
     
-    // We send a simple binary packet: [Speed (int)][RPM (int)][Battery (int)]
-    out << m_speed << m_rpm << 85; 
+    // Binary packet: [Speed][RPM][Battery][Gear][TurnSignal][Odometer][Range][ADAS]
+    out << m_speed << m_rpm << 85 << m_gear << m_turnSignal << m_odometer << m_range << m_adasDistance; 
 
     for (QLocalSocket* client : m_clients) {
         if (client->state() == QLocalSocket::ConnectedState) {

@@ -23,7 +23,9 @@ set(CLUSTER_SOURCES
     src/services/CanSimulator.h
     src/services/CanSimulator.h.md
     qml/main.qml.md
-    qml/Speedometer.qml.md
+    qml/DialGauge.qml.md
+    qml/AdasCenter.qml.md
+    qml/Telltales.qml.md
     CMakeLists.txt.md
 )
 
@@ -47,7 +49,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     # QML files
     set(QML_FILES
         qml/main.qml
-        qml/Speedometer.qml
+        qml/DialGauge.qml
+        qml/AdasCenter.qml
+        qml/Telltales.qml
     )
     
     if(COMMAND qt_policy)

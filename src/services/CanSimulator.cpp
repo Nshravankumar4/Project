@@ -61,13 +61,20 @@ void CanSimulator::onReadyRead() {
 
     // Read available data from the IPC socket
     while (!in.atEnd()) {
-        int speed = 0, rpm = 0, batterySoc = 0;
-        in >> speed >> rpm >> batterySoc;
+        int speed = 0, rpm = 0, batterySoc = 0, turnSignal = 0, odometer = 0, range = 0, adasDistance = 0;
+        QString gear;
+        
+        in >> speed >> rpm >> batterySoc >> gear >> turnSignal >> odometer >> range >> adasDistance;
 
         // Bridge to the ViewModel (Cross-thread signal emission)
         emit speedReceived(speed);
         emit rpmReceived(rpm);
         emit batterySocReceived(batterySoc);
+        emit gearReceived(gear);
+        emit turnSignalReceived(turnSignal);
+        emit odometerReceived(odometer);
+        emit rangeReceived(range);
+        emit adasDistanceReceived(adasDistance);
     }
 }
 

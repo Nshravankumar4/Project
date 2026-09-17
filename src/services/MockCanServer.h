@@ -31,5 +31,10 @@ private:
     // Vehicle State
     int m_speed = 0;
     int m_rpm = 1000;
+    QString m_gear = "P";
+    int m_turnSignal = 0; // 0=off, 1=left, 2=right
+    int m_odometer = 15420;
+    int m_range = 450;
+    int m_adasDistance = 100;
 };
 

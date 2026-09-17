@@ -82,8 +82,8 @@ void MockCanServer::broadcastVehicleData() {
     QDataStream out(&block, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_6_0);
     
-    // We send a simple binary packet: [Speed][RPM][Battery]
-    out << m_speed << m_rpm << 85; 
+    // We send a complex binary packet: [Speed][RPM][Battery][Gear][TurnSignal][Odo][Range][ADAS]
+    out << m_speed << m_rpm << 85 << m_gear << m_turnSignal << m_odometer << m_range << m_adasDistance; 
 
     // 3. Loop through all connected clients and write the bytes to them
     for (QLocalSocket* client : m_clients) {

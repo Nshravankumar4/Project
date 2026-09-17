@@ -4,70 +4,84 @@ import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
 
 Window {
-    width: 800
+    width: 1280
     height: 480
     visible: true
-    title: qsTr("Automotive Cluster Demo")
-    color: "#1a1a1a"
+    title: qsTr("Hyundai Mobis Digital Cluster")
+    color: "#050505" 
 
-    // Top Bar (Battery, Info)
-    Rectangle {
-        id: topBar
-        width: parent.width
-        height: 40
-        color: "transparent"
+    // Telltales at the top
+    Telltales {
+        anchors.top: parent.top
+        anchors.horizontalCenter: parent.horizontalCenter
+        turnSignal: clusterViewModel.turnSignal
+    }
 
-        Text {
-            anchors.right: parent.right
-            anchors.rightMargin: 20
-            anchors.verticalCenter: parent.verticalCenter
-            text: "Battery: " + clusterViewModel.batterySoc + "%"
-            color: clusterViewModel.batterySoc > 20 ? "#2ecc71" : "#e74c3c"
-            font.pixelSize: 18
-            font.bold: true
+    // Main 3-Zone Layout
+    RowLayout {
+        anchors.centerIn: parent
+        spacing: 30
+
+        // ZONE 1: Speedometer (Left)
+        DialGauge {
+            value: clusterViewModel.speed
+            maxValue: 240
+            title: "SPEED"
+            label: "km/h"
+            glowColor: "#00d2ff" // Cyan glow
+        }
+
+        // ZONE 2: ADAS Center View
+        AdasCenter {
+            adasDistance: clusterViewModel.adasDistance
+        }
+
+        // ZONE 3: RPM Tachometer (Right)
+        DialGauge {
+            value: clusterViewModel.rpm
+            maxValue: 8000
+            title: "POWER"
+            label: "rpm"
+            glowColor: "#ff3366" // Red/Pink glow
         }
     }
 
-    RowLayout {
-        anchors.centerIn: parent
-        spacing: 50
+    // Bottom Status Bar
+    Rectangle {
+        anchors.bottom: parent.bottom
+        width: parent.width
+        height: 60
+        color: "transparent"
 
-        // RPM Display
-        Rectangle {
-            width: 200
-            height: 200
-            radius: 100
-            color: "#34495e"
+        // PRND Gear Selector
+        RowLayout {
+            anchors.centerIn: parent
+            spacing: 20
             
-            Column {
-                anchors.centerIn: parent
-                spacing: 5
-                
-                Text {
-                    // Data binding: automatically updates when clusterViewModel.rpm changes
-                    text: clusterViewModel.rpm
-                    color: "white"
-                    font.pixelSize: 42
-                    font.bold: true
-                    horizontalAlignment: Text.AlignHCenter
-                    width: parent.width
-                }
-                Text {
-                    text: "RPM"
-                    color: "#95a5a6"
-                    font.pixelSize: 18
-                    horizontalAlignment: Text.AlignHCenter
-                    width: parent.width
-                }
-            }
+            Text { text: "P"; color: clusterViewModel.gear === "P" ? "#2ecc71" : "#444"; font.pixelSize: 28; font.bold: clusterViewModel.gear === "P" }
+            Text { text: "R"; color: clusterViewModel.gear === "R" ? "#e74c3c" : "#444"; font.pixelSize: 28; font.bold: clusterViewModel.gear === "R" }
+            Text { text: "N"; color: clusterViewModel.gear === "N" ? "#f1c40f" : "#444"; font.pixelSize: 28; font.bold: clusterViewModel.gear === "N" }
+            Text { text: "D"; color: clusterViewModel.gear === "D" ? "#3498db" : "#444"; font.pixelSize: 32; font.bold: clusterViewModel.gear === "D" }
         }
 
-        // Speedometer Custom Component
-        Speedometer {
-            id: speedo
-            // Bind the QML property to the C++ Q_PROPERTY
-            currentSpeed: clusterViewModel.speed
+        // Left Bottom (Temp / Range)
+        Text {
+            anchors.left: parent.left
+            anchors.leftMargin: 40
+            anchors.verticalCenter: parent.verticalCenter
+            text: "22°C   |   Range: " + clusterViewModel.range + " km"
+            color: "#aaaaaa"
+            font.pixelSize: 18
+        }
+
+        // Right Bottom (ODO)
+        Text {
+            anchors.right: parent.right
+            anchors.rightMargin: 40
+            anchors.verticalCenter: parent.verticalCenter
+            text: "ODO: " + clusterViewModel.odometer + " km"
+            color: "#aaaaaa"
+            font.pixelSize: 18
         }
     }
 }
-
